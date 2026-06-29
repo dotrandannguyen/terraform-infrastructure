@@ -29,9 +29,9 @@ app.get('/api', (req: Request, res: Response) => {
 // Endpoint mô phỏng dữ liệu hệ thống để test UI
 app.get('/api/info', (req: Request, res: Response) => {
   const mockInfo = {
-    serverTime: new Date().toLocaleTimeString(),
-    environment: process.env.NODE_ENV || 'development',
-    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'PRODUCTION',
+    version: '2.0.0',
+    timestamp: new Date().toISOString(),
     services: [
       { id: 1, name: 'User Service', status: 'Running' },
       { id: 2, name: 'Payment Service', status: 'Running' },

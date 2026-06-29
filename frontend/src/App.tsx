@@ -28,7 +28,7 @@ function App() {
   return (
     <div className="dashboard-container">
       <header className="header">
-        <h1>AWS Production Dashboard</h1>
+        <h1>AWS PBL3 Dashboard - Auto Deployed!</h1>
         <div className="status-badge">{health}</div>
       </header>
 

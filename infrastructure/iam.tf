@@ -47,3 +47,37 @@ resource "aws_iam_role" "github_actions_role" {
     }]
   })
 }
+
+# C?p quy?n cho GitHub Actions Role
+resource "aws_iam_role_policy_attachment" "gh_ecr" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+}
+
+resource "aws_iam_role_policy_attachment" "gh_ecs" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "gh_s3" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "gh_cloudfront" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudFrontFullAccess"
+}
+
+resource "aws_iam_role_policy" "gh_passrole" {
+  name = "-gh-passrole"
+  role = aws_iam_role.github_actions_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action   = "iam:PassRole"
+      Effect   = "Allow"
+      Resource = "*"
+    }]
+  })
+}

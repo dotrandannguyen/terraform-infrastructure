@@ -1,0 +1,118 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+}
+
+.dashboard-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #eaeaea;
+}
+
+.header h1 {
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.status-badge {
+  background-color: #e8f8f5;
+  color: #1abc9c;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid #1abc9c;
+}
+
+.info-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+}
+
+.card h3 {
+  color: #34495e;
+  margin-bottom: 1rem;
+  font-size: 18px;
+}
+
+.card p {
+  margin-bottom: 0.8rem;
+  font-size: 15px;
+  color: #555;
+}
+
+.tag {
+  background: #3498db;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.service-list {
+  list-style: none;
+}
+
+.service-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 15px;
+}
+
+.service-list li:last-child {
+  border-bottom: none;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.badge.running {
+  background: #eafaf1;
+  color: #27ae60;
+}
+
+.badge.warning {
+  background: #fef5e7;
+  color: #f39c12;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 3rem;
+  color: #7f8c8d;
+  font-size: 1.2rem;
+  font-style: italic;
+}

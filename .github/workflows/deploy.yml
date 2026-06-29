@@ -1,0 +1,95 @@
+name: Deploy to AWS ECS & S3
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-southeast-1
+  ECR_REPOSITORY: pbl3-app-backend
+  ECS_SERVICE: pbl3-app-service
+  ECS_CLUSTER: pbl3-app-cluster
+  ECS_TASK_DEFINITION: taskdef.json # Sẽ được sinh ra động
+  CONTAINER_NAME: backend
+  S3_BUCKET: pbl3-app-frontend-bucket-unique-123
+  CLOUDFRONT_ID: UPDATE_ME_AFTER_TF_APPLY
+
+# Cấp quyền cho workflow request JWT token từ GitHub
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: arn:aws:iam::YOUR_ACCOUNT_ID:role/pbl3-app-github-actions-role
+        aws-region: ${{ env.AWS_REGION }}
+
+    # BACKEND: Build & Push Docker Image
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./backend
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    # BACKEND: Download & Update ECS Task Definition
+    - name: Download current task definition
+      run: |
+        aws ecs describe-task-definition --task-definition pbl3-app-task --query taskDefinition > taskdef.json
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: taskdef.json
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    # FRONTEND: Build & Deploy to S3
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
+    - name: Sync Frontend to S3
+      run: |
+        aws s3 sync frontend/dist/ s3://${{ env.S3_BUCKET }} --delete
+
+    - name: Invalidate CloudFront Cache
+      run: |
+        # Bạn cần thay CLOUDFRONT_ID bằng giá trị thực tế sau khi Terraform cấp
+        # aws cloudfront create-invalidation --distribution-id ${{ env.CLOUDFRONT_ID }} --paths "/*"
+        echo "Please update CLOUDFRONT_ID to enable invalidation"

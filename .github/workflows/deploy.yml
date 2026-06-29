@@ -13,7 +13,7 @@ env:
   ECS_TASK_DEFINITION: taskdef.json # Sẽ được sinh ra động
   CONTAINER_NAME: backend
   S3_BUCKET: pbl3-app-frontend-bucket-unique-123
-  CLOUDFRONT_ID: UPDATE_ME_AFTER_TF_APPLY
+  CLOUDFRONT_ID: EFTCAC4YY2R0H
 
 # Cấp quyền cho workflow request JWT token từ GitHub
 permissions:
@@ -90,6 +90,4 @@ jobs:
 
     - name: Invalidate CloudFront Cache
       run: |
-        # Bạn cần thay CLOUDFRONT_ID bằng giá trị thực tế sau khi Terraform cấp
-        # aws cloudfront create-invalidation --distribution-id ${{ env.CLOUDFRONT_ID }} --paths "/*"
-        echo "Please update CLOUDFRONT_ID to enable invalidation"
+        aws cloudfront create-invalidation --distribution-id ${{ env.CLOUDFRONT_ID }} --paths "/*"
